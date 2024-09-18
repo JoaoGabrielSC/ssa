@@ -1,0 +1,45 @@
+.Content {
+    padding: 10px;
+    /* max-height: 60vh;
+    background-color: #ca3601; */
+    /* min-height: calc(100vh - 40px - 70px); Adjust for Header and Footer */
+}
+
+.App {
+    min-height: 60vh;
+}
+
+/* Ensure the menu and title stay on the same line */
+.ant-layout-header {
+    display: flex;
+    align-items: center;
+}
+
+.ant-menu-horizontal {
+    display: flex;
+    justify-content: flex-start;
+    flex: 1 0 auto; /* Ensure menu doesn't collapse */
+}
+
+.ant-menu-item-selected {
+  background-color: #ca3601 !important; /* Laranja mais escuro */
+  color: white !important;
+}
+
+.orange-button {
+  background-color: #ca3601;
+  border-color: #ca3601;
+  color: white; /* Garante que o texto fique legível */
+}
+
+.orange-button:hover {
+  background-color: #ff4500; /* Cor um pouco mais clara ao passar o mouse */
+  border-color: #ff4500;
+}
+  /* Adicionalmente, se precisar definir o estilo quando o botão está ativo ou focado */
+.orange-button:active,
+.orange-button:focus {
+  background-color: #ff4500;
+  border-color: #ff4500;
+  color: white;
+}

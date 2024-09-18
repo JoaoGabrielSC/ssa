@@ -1,0 +1,12 @@
+.fabric-canvas {
+  position: relative;
+  width: 1080px;
+  height: 720px; /* This height should work based on the remaining space in the viewport */
+  overflow: hidden;
+  background-color: #f4f4f4;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+}
+

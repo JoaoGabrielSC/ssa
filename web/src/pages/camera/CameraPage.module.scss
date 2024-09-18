@@ -1,0 +1,38 @@
+.container {
+    display: flex;
+    justify-content: space-between; /* Distribui o espaço entre os containers */
+    width: 100%;
+    height: 90vh;
+    align-items: center; /* Alinha verticalmente os containers no meio */
+    padding: 0 100px; /* Adiciona uma margem lateral */
+}
+
+.videoContainer {
+    width: 720px; /* Largura fixa para o vídeo */
+    height: 480px; /* Altura fixa para o vídeo */
+    display: flex;
+    align-items: center; /* Centraliza o vídeo verticalmente dentro do container */
+    justify-content: center; /* Centraliza o vídeo horizontalmente dentro do container */
+    background-color: black; /* Cor de fundo preta para o container do vídeo */
+}
+
+.chartContainer {
+    width: 720px; /* Ajuste a largura conforme necessário */
+    height: 480px; /* Ajuste a altura conforme necessário */
+    display: flex;
+    align-items: center; /* Centraliza o gráfico verticalmente dentro do container */
+    justify-content: center; /* Centraliza o gráfico horizontalmente dentro do container */
+    background-color: white; /* Cor de fundo para o container do gráfico */
+    border: 1px solid #000; /* Borda ao redor do container do gráfico */
+}
+
+.video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ajusta o vídeo para cobrir o container */
+}
+
+.chartContainer canvas {
+    width: 100% !important;
+    height: 100% !important;
+}

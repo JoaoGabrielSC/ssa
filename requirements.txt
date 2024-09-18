@@ -1,0 +1,7 @@
+opencv-python==4.10.0.82     
+python-dotenv==1.0.1
+pydantic==2.8.2
+fastapi==0.112.1
+uvicorn==0.30.6
+imageio==2.35.1
+SQLalchemy==2.0.34
