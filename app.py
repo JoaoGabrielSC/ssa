@@ -7,7 +7,6 @@ import random
 import json
 import time
 from services.regions_service import RegionService
-# from services.cam_gear import Reconnecting_CamGear
 from services.dto import RegionDTO
 from models import Database
 import io
@@ -100,8 +99,7 @@ def background_kr():
 
 @app.get('/grafico')
 async def chart_data():
-    # perform all frames in the video in videos/video_1.mp4
-    
+    raise NotImplementedError
     
 @app.get('/remove_region')
 def remove_region():

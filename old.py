@@ -26,7 +26,7 @@ class VideoPolygonDrawer:
         cv2.polylines(frame, [pts], isClosed=True, color=(255, 0, 0), thickness=2)
         return frame
 
-    def calculate_inverse_sum_(self, mask, masked_frame):
+    def calculate_inverse_sum(self, mask, masked_frame):
         pixels_inside = masked_frame[mask == 255]
         pixels_inside = np.array(pixels_inside, dtype=np.uint8)
         pixels_inside_handled = np.where(pixels_inside == 0, 1, pixels_inside)
@@ -37,35 +37,24 @@ class VideoPolygonDrawer:
         index_initial = sum_inverse_intensities / quantity_pixels
         return index_initial
     
-    def calculate_inverse_sum(self, frame: np.array, polygon: list, debug: bool = False)-> float:
-        """
-        Calculate the inverse sum of the intensities of the pixels inside the polygon.
-        Args:  
-            frame: np.array: Um array contendo o frame atual carregado pela opencv.
-            polygon: list: Uma lista com os pontos que delimitão a região de interesse.
-            debug: bool (default = False): Variável auxiliar para caso queira debugar.
-        Returns:
-            float: Média do somatório do inverso da intensidade de todos os pixels dentro da região.
-        """
+    def debbuger(frame: ArrayLike, mask: ArrayLike) -> None:
+        mask = cv2.addWeighted(mask, 0.5, frame, 0.5, 0)
+        mask = np.uint8(mask)
+        masked_frame = cv2.bitwise_and(frame, frame, mask=mask)
+        print(f"Frame dtype: {frame.dtype}, shape: {frame.shape}")
+        print(f"Mask dtype: {mask.dtype}, shape: {mask.shape}")
+        cv2.imshow('Mask', mask)
+        cv2.imshow('Masked Frame', masked_frame)
 
+    def apply_polygon_mask(self, frame: np.array, polygon: list, debug: bool = False)->tuple:
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         mask = np.zeros(frame.shape[:2], dtype=np.uint8)
         pts = np.array(polygon, np.int32)
         mask = cv2.fillPoly(mask, [pts], 255)
 
-        if debug:
-            mask = cv2.addWeighted(mask, 0.5, frame, 0.5, 0)
-            mask = np.uint8(mask)
-            print(f"Frame dtype: {frame.dtype}, shape: {frame.shape}")
-            print(f"Mask dtype: {mask.dtype}, shape: {mask.shape}")
-            # print(type(mask.dtype))
-            cv2.imshow('Mask', mask)
-            cv2.imshow('Masked Frame', masked_frame)
-
         masked_frame = cv2.bitwise_and(frame, frame, mask=mask)
-        index_initial = self.calculate_inverse_sum_(mask, masked_frame) 
     
-        return index_initial
+        return mask, masked_frame
 
     def process_video(self, video_path, x_offset=0, y_offset=0)->None:
         cap = cv2.VideoCapture(video_path)
@@ -111,6 +100,6 @@ class VideoPolygonDrawer:
 # Uso
 database = Database(os.getenv('DATABASE_URL'))
 region_service = RegionService(database)
-video_drawer = VideoPolygonDrawer(region_service, index_target = 10)
+video_drawer = VideoPolygonDrawer(region_service)
 
 video_drawer.process_video('videos/video_2.avi', x_offset=-10, y_offset=25)

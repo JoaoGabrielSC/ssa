@@ -379,9 +379,6 @@ export const useFabricRef = (canvas?: fabric.Canvas, feature?: string) => {
 
         return {polygon};
     }
-    
-
-
 
     function getPolygons() {
         return canvas?.getObjects().filter(obj => obj instanceof Region) as Region[];

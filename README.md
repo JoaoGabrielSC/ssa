@@ -56,3 +56,4 @@ TODO:
 -> Index : somatório do inverso da itensidade do pixels dentro da região delimitada
 -> SlagIndex : somatório do inverso da itensidade dos pixels < threshold
 -> Iron: somatório do inverso da itensidade dos pixels > threshold
+-> Pensar em um lugar melhor para a camera
