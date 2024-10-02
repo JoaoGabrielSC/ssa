@@ -47,9 +47,9 @@ TODO:
 (x) Na tela da camera mostrar região na imagem sem poder editar ela
 (x) Fixar onde a região aparece para um tamanho fixo de 1080x720 e salvar no banco de dados
 (x) VALOR INICIAL É SOMATÓRIO INICIAL DO INVERSO DE TODOS PIXELS DENTRO DA REGIÃO DE INTERESSE
-() INDEX INICIAL, SLAG INDEX, IRON INDEX
-() COLOCAR NA TELA DASHBOARD O SLAG INDEX X TIME, COLOCAR OS FILTROS PARA ANÁLISE
-
+(x) INDEX INICIAL, SLAG INDEX, IRON INDEX
+(x) COLOCAR NA TELA DASHBOARD O SLAG INDEX X TIME, COLOCAR OS FILTROS PARA ANÁLISE
+() colocar a matriz da intensidade de dos pixels
 
 ## anotações
 -> if frame == 0 -> frame = 1, if frame ==255 -> frame = 256

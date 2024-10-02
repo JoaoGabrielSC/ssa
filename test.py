@@ -17,4 +17,4 @@ if __name__ == '__main__':
     region_service = RegionService(database)
     video_drawer = FrameProcess(region_service)
 
-    video_drawer.process_video('videos/video_3.avi', x_offset=-60, y_offset=-50)
+    video_drawer.process_video('videos/video_2.avi', x_offset=0, y_offset=0)

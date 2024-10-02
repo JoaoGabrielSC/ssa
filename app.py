@@ -77,6 +77,11 @@ def background_kr():
     frame = buffer.tobytes()
     return StreamingResponse(io.BytesIO(frame), media_type='image/jpeg')
 
+
+@app.get('/OnMouseEvent')
+def OnMouseEvent():
+    raise NotImplementedError
+
 # @app.get('/video')
 # def video():
 #     # # Capture a single frame

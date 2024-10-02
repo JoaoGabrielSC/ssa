@@ -3,6 +3,8 @@ from utils.mouse_handler import MouseHandler
 from numpy.typing import ArrayLike
 from dotenv import load_dotenv
 from models import Database
+import matplotlib.pyplot as plt
+import seaborn as sns
 from typing import Tuple
 import numpy as np
 import time
@@ -68,11 +70,48 @@ class FrameProcess:
         pixels_inside = np.array(pixels_inside, dtype=np.uint8)
         non_zero_pixels = np.where(pixels_inside == 0, 1, pixels_inside)
         inverse_intensities = 1 / non_zero_pixels if len(non_zero_pixels) > 0 else 0
-
+        # print(f'Intensidades: {pixels_inside}')
+        # print(f'Inverso da intensidade: {inverse_intensities}')
+        # print(f'Media do inverso da intensidade: {np.mean(inverse_intensities)}')
+        # print(f'Minimo do inverso da intensidade: {np.min(inverse_intensities)}')
+        # print(f'Maximo do inverso da intensidade: {np.max(inverse_intensities)}')
         quantity_pixels = len(pixels_inside)
+        # print(f'Quantidade de pixels: {quantity_pixels}')
         sum_inverse_intensities = np.sum(inverse_intensities)
+        # print(f'Soma do inverso da intensidade: {sum_inverse_intensities}')
         index = sum_inverse_intensities / quantity_pixels
         return index
+    
+    @staticmethod
+    def plot_pixel_intensity_heatmap(pixels_inside: ArrayLike, frame_number: int) -> None:
+        """
+        Plota um heatmap das intensidades dos pixels_inside
+        Args:
+            pixels_inside: ArrayLike - Intensidades dos pixels dentro da região
+            frame_number: int - Número do frame atual (para identificar no gráfico)
+        Return: 
+            None
+        """
+        # Normaliza as intensidades para o intervalo [0, 1]
+        normalized_intensities = (pixels_inside - np.min(pixels_inside)) / (np.max(pixels_inside) - np.min(pixels_inside))
+
+        # Cria uma matriz 2D para o heatmap (você pode ajustar a forma dependendo do tamanho dos dados)
+        heatmap_data = normalized_intensities.reshape(-1, 1)  # Ajusta para ser uma matriz 2D
+
+        plt.figure(figsize=(6, 4))
+        cbar_sticks = np.arange(0, 1.1, 0.05)
+        sns.heatmap(
+            heatmap_data, 
+            cmap='gray', 
+            cbar=True, 
+            vmin=0, 
+            vmax=1,
+            cbar_kws={'ticks': cbar_sticks}
+            )
+        plt.title(f'Heatmap de Intensidade de Pixels - Frame {frame_number}')
+        plt.xlabel('Pixels')
+        plt.ylabel('Intensidade Normalizada')
+        plt.show()
 
     def extract_pixels_inside(self, frame: ArrayLike, polygon: list, debug: bool = False) -> Tuple[ArrayLike, ArrayLike]:
         """
@@ -104,7 +143,7 @@ class FrameProcess:
             cv2.imshow('Masked Frame', masked_frame)
 
         masked_frame = cv2.bitwise_and(frame, frame, mask=mask)
-    
+        # cv2.imshow('masked', masked_frame)
         return mask, masked_frame
 
        
@@ -162,15 +201,19 @@ class FrameProcess:
                     count += 1
 
                     # if count % 10 == 0:
+                    print(f'='*30)
                     mask, masked_frame = self.extract_pixels_inside(frame, polygon_with_offset)
                     index = self.calculate_index(mask, masked_frame)
                     time_seconds = count / fps
                     writer.writerow([count, time_seconds, index])
-                    print(f'Frame: {count}, Tempo: {time_seconds}s, Index: {index}')
+                    # print(f'Frame: {count}, Tempo: {time_seconds}s, Index: {index}')
 
+                    # if count % 20 == 0:
+                    #     self.plot_pixel_intensity_heatmap (masked_frame[mask == 255], count)
+                    
                     frame = self.draw_polygon_on_frame(frame, polygon_with_offset)
 
-                cv2.imshow('Vídeo com Polígono', frame)
+                # cv2.imshow('Vídeo com Polígono', frame)
                 if cv2.waitKey(25) & 0xFF == ord('q'):
                     break
 

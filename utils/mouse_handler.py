@@ -1,5 +1,17 @@
+import os
 import cv2
 import numpy as np
+from models import Database
+from services.dto import RegionDTO
+from services.regions_service import RegionService
+import traceback
+from dotenv import load_dotenv
+
+load_dotenv()
+
+database = Database(os.getenv('DATABASE_URL'))
+region_service = RegionService(database)
+
 
 class MouseHandler:
     def __init__(self):
@@ -60,6 +72,8 @@ class MouseHandler:
         self.selected_point = None
         self.paused = False
 
+        self.update_region(polygon_with_offset)
+
     def mouse_callback(self, event: int, x: int, y: int, flag: any, param: list) -> None:
         """
         Função callback para manipulação de vértices de um polígono com o mouse.
@@ -82,3 +96,27 @@ class MouseHandler:
         # Verifica se o evento possui um manipulador correspondente e o executa
         if event in event_handlers:
             event_handlers[event](x, y, polygon_with_offset)
+
+    @staticmethod
+    def update_region(polygon_with_offset: np.array) -> None:
+        """
+        Atualiza a região de interesse no banco de dados.
+        Args:
+            polygon_with_offset (np.array): Polígono com deslocamento.
+        Returns:
+            None
+        Raises:
+            Exception: Se ocorrer um erro ao atualizar a região.
+        """
+        regions = [[int(x), int(y)] for x, y in polygon_with_offset]
+        entry = RegionDTO(
+            name='KR_ROI',
+            polygon=regions
+        )
+    
+        try:
+            region_service.update_region(id=1, data=entry)
+            return {'status': 'success'}
+        except Exception as e:
+            traceback.print_exc()
+            return {'error': str(e)}
