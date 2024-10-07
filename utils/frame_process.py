@@ -9,7 +9,6 @@ import numpy as np
 import seaborn as sns
 from dotenv import load_dotenv
 from numpy.typing import ArrayLike
-from sklearn.cluster import KMeans
 
 from models import Database
 from services.regions_service import RegionService
@@ -73,33 +72,44 @@ class FrameProcess:
         pixels_inside = np.array(pixels_inside, dtype=np.uint8)
         non_zero_pixels = np.where(pixels_inside == 0, 1, pixels_inside)
         inverse_intensities = 1 / non_zero_pixels if len(non_zero_pixels) > 0 else 0
-
-        # print(f'Intensidades: {pixels_inside}')
-        # print(f'Inverso da intensidade: {inverse_intensities}')
-        # print(f'Media do inverso da intensidade: {np.mean(inverse_intensities)}')
-        # print(f'Minimo do inverso da intensidade: {np.min(inverse_intensities)}')
-        # print(f'Maximo do inverso da intensidade: {np.max(inverse_intensities)}')
         quantity_pixels = len(pixels_inside)
-        # print(f'Quantidade de pixels: {quantity_pixels}')
         sum_inverse_intensities = np.sum(inverse_intensities)
-        # print(f'Soma do inverso da intensidade: {sum_inverse_intensities}')
         index = sum_inverse_intensities / quantity_pixels
+        
+
+        height, width = mask.shape  # Obtem as dimensões da imagem
+
+        # Forma a matriz para escrita
+        intensity_matrix = np.zeros((height, width), dtype=np.uint8)
+        intensity_matrix[mask == 255] = pixels_inside
 
         file = f'logs/log_intensity_{i}.csv'
         if i == 1:
-            self.save_log('w', file, pixels_inside)
+            self.save_log('w', file, intensity_matrix, height, width)
         if i%300 == 0:
-            self.save_log('w', file, pixels_inside)
+            self.save_log('w', file, intensity_matrix, height, width)
 
         return index
     
     @staticmethod
-    def save_log(mode: str, filename: str, data: ArrayLike, header: Optional[str] = "Intensities Matrix") -> None:
-        with open (filename, mode=mode, newline='') as file:
+    def save_log(mode: str, filename: str, data: ArrayLike, height: int, witdh: int, header: Optional[str] = "Intensities Matrix") -> None:
+        """
+        Salva o log da matriz de intensidades em um arquivo csv
+        Args:
+            mode: str - Modo de abertura do arquivo
+            filename: str - Nome do arquivo
+            data: ArrayLike - Matriz de intensidades
+            height: int - Altura da matriz
+            width: int - Largura da matriz
+            header: str - Cabeçalho do arquivo
+        Returns:
+            None
+        """
+        with open(filename, mode=mode, newline='') as file:
             writer_ = csv.writer(file)
-            writer_.writerow(['Intensities Matrix'])
-            for value in data:
-                writer_.writerow([value])
+            writer_.writerow([header])
+            for row in range(height):
+                writer_.writerow(data[row])
 
     @staticmethod
     def plot_pixel_intensity_heatmap(pixels_inside: ArrayLike, frame_number: int) -> None:
@@ -164,7 +174,6 @@ class FrameProcess:
         # cv2.imshow('masked', masked_frame)
         return mask, masked_frame
 
-       
     def process_video(self, video_path: str, x_offset: int, y_offset: int, log_folder: str ='logs') -> None:
         """
         Processa o vídeo e performa o cálculo do index e plota a região no frame
