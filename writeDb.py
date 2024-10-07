@@ -1,8 +1,10 @@
-from services.regions_service import RegionService
-from services.dto import RegionDTO
-from models import Database
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+
+from models import Database
+from services.dto import RegionDTO
+from services.regions_service import RegionService
 
 load_dotenv()
 

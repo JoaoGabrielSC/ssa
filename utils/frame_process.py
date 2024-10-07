@@ -1,16 +1,19 @@
+import csv
+import os
+import time
+from typing import Tuple, Optional
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+from dotenv import load_dotenv
+from numpy.typing import ArrayLike
+from sklearn.cluster import KMeans
+
+from models import Database
 from services.regions_service import RegionService
 from utils.mouse_handler import MouseHandler
-from numpy.typing import ArrayLike
-from dotenv import load_dotenv
-from models import Database
-import matplotlib.pyplot as plt
-import seaborn as sns
-from typing import Tuple
-import numpy as np
-import time
-import csv
-import cv2
-import os
 
 load_dotenv()
 
@@ -50,7 +53,7 @@ class FrameProcess:
 
         return frame
 
-    def calculate_index(self, mask: ArrayLike, masked_frame: ArrayLike) -> float:
+    def calculate_index(self, mask: ArrayLike, masked_frame: ArrayLike, i: int) -> float:
         """
         Calcula o somatório do inverso da intensidade dos pixels dentro da ROI
         Args:
@@ -70,6 +73,7 @@ class FrameProcess:
         pixels_inside = np.array(pixels_inside, dtype=np.uint8)
         non_zero_pixels = np.where(pixels_inside == 0, 1, pixels_inside)
         inverse_intensities = 1 / non_zero_pixels if len(non_zero_pixels) > 0 else 0
+
         # print(f'Intensidades: {pixels_inside}')
         # print(f'Inverso da intensidade: {inverse_intensities}')
         # print(f'Media do inverso da intensidade: {np.mean(inverse_intensities)}')
@@ -80,8 +84,23 @@ class FrameProcess:
         sum_inverse_intensities = np.sum(inverse_intensities)
         # print(f'Soma do inverso da intensidade: {sum_inverse_intensities}')
         index = sum_inverse_intensities / quantity_pixels
+
+        file = f'logs/log_intensity_{i}.csv'
+        if i == 1:
+            self.save_log('w', file, pixels_inside)
+        if i%300 == 0:
+            self.save_log('w', file, pixels_inside)
+
         return index
     
+    @staticmethod
+    def save_log(mode: str, filename: str, data: ArrayLike, header: Optional[str] = "Intensities Matrix") -> None:
+        with open (filename, mode=mode, newline='') as file:
+            writer_ = csv.writer(file)
+            writer_.writerow(['Intensities Matrix'])
+            for value in data:
+                writer_.writerow([value])
+
     @staticmethod
     def plot_pixel_intensity_heatmap(pixels_inside: ArrayLike, frame_number: int) -> None:
         """
@@ -115,8 +134,7 @@ class FrameProcess:
 
     def extract_pixels_inside(self, frame: ArrayLike, polygon: list, debug: bool = False) -> Tuple[ArrayLike, ArrayLike]:
         """
-        Performa pixel a pixel o operador AND comparando o frame original com a 
-            região de interesse
+        Performa pixel a pixel o operador AND comparando o frame original com a região de interesse
         Args:
             frame: ArrayLike - Frame Carregado pela opencv
             polygon: list - Lista contendo as coordenadas da região de interesse
@@ -201,12 +219,12 @@ class FrameProcess:
                     count += 1
 
                     # if count % 10 == 0:
-                    print(f'='*30)
+                    # print(f'='*30)
                     mask, masked_frame = self.extract_pixels_inside(frame, polygon_with_offset)
-                    index = self.calculate_index(mask, masked_frame)
+                    index = self.calculate_index(mask, masked_frame, count)
                     time_seconds = count / fps
                     writer.writerow([count, time_seconds, index])
-                    # print(f'Frame: {count}, Tempo: {time_seconds}s, Index: {index}')
+                    print(f'Frame: {count}, Tempo: {time_seconds}s, Index: {index}')
 
                     # if count % 20 == 0:
                     #     self.plot_pixel_intensity_heatmap (masked_frame[mask == 255], count)

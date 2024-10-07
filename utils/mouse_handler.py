@@ -1,11 +1,13 @@
 import os
+import traceback
+
 import cv2
 import numpy as np
+from dotenv import load_dotenv
+
 from models import Database
 from services.dto import RegionDTO
 from services.regions_service import RegionService
-import traceback
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -22,8 +24,7 @@ class MouseHandler:
 
     def set_mouse_event_handlers(self):
         """
-        Define o mapeamento de eventos de mouse para os respectivos manipuladores.
-        
+        Define o mapeamento de eventos de mouse para os respectivos manipuladores.       
         Returns:
             dict: Mapeamento de eventos de mouse para funções de manipulação de eventos.
         """
