@@ -2,17 +2,22 @@ import csv
 import os
 import time
 from typing import Tuple, Optional
+from collections import deque
 
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from dotenv import load_dotenv
+import numpy as np
 from numpy.typing import ArrayLike
 
 from models import Database
 from services.regions_service import RegionService
 from utils.mouse_handler import MouseHandler
+
+MAX_LEN: int = 250  
+queue = deque(maxlen=MAX_LEN)
 
 load_dotenv()
 
@@ -76,19 +81,6 @@ class FrameProcess:
         sum_inverse_intensities = np.sum(inverse_intensities)
         index = sum_inverse_intensities / quantity_pixels
         
-
-        height, width = mask.shape  # Obtem as dimensões da imagem
-
-        # Forma a matriz para escrita
-        intensity_matrix = np.zeros((height, width), dtype=np.uint8)
-        intensity_matrix[mask == 255] = pixels_inside
-
-        file = f'logs/log_intensity_{i}.csv'
-        if i == 1:
-            self.save_log('w', file, intensity_matrix, height, width)
-        if i%300 == 0:
-            self.save_log('w', file, intensity_matrix, height, width)
-
         return index
     
     @staticmethod
@@ -231,9 +223,15 @@ class FrameProcess:
                     # print(f'='*30)
                     mask, masked_frame = self.extract_pixels_inside(frame, polygon_with_offset)
                     index = self.calculate_index(mask, masked_frame, count)
-                    time_seconds = count / fps
-                    writer.writerow([count, time_seconds, index])
-                    print(f'Frame: {count}, Tempo: {time_seconds}s, Index: {index}')
+                    queue.append(index)
+
+                    if len(queue) == MAX_LEN:
+                        array = np.array(queue).astype(np.float32)
+                        mean = np.mean(array)
+
+                        time_seconds = count / fps
+                        writer.writerow([count, time_seconds, mean])
+                        print(f'Frame: {count}, Tempo: {time_seconds}s, Index: {mean}')
 
                     # if count % 20 == 0:
                     #     self.plot_pixel_intensity_heatmap (masked_frame[mask == 255], count)
