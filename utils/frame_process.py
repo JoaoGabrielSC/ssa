@@ -16,7 +16,7 @@ from models import Database
 from services.regions_service import RegionService
 from utils.mouse_handler import MouseHandler
 
-MAX_LEN: int = 250  
+MAX_LEN: int = 25
 queue = deque(maxlen=MAX_LEN)
 
 load_dotenv()
@@ -192,10 +192,9 @@ class FrameProcess:
         
         region = regions[0]  
         polygon = region.polygon
-        # polygon = [[1,1],[2,2]...[n,n]]
+        # polygon = [...[n,n] [n+1 n+1] ´[n+2, n+2]]
         polygon_with_offset = self.apply_offset(polygon, x_offset, y_offset)
 
-        # Definir o callback do mouse para manipular o polígono
         cv2.namedWindow('Vídeo com Polígono')
         cv2.setMouseCallback(
             'Vídeo com Polígono', 
@@ -227,18 +226,16 @@ class FrameProcess:
 
                     if len(queue) == MAX_LEN:
                         array = np.array(queue).astype(np.float32)
+                        print(array)
                         mean = np.mean(array)
 
                         time_seconds = count / fps
                         writer.writerow([count, time_seconds, mean])
+                        queue.clear()
                         print(f'Frame: {count}, Tempo: {time_seconds}s, Index: {mean}')
 
-                    # if count % 20 == 0:
-                    #     self.plot_pixel_intensity_heatmap (masked_frame[mask == 255], count)
-                    
                     frame = self.draw_polygon_on_frame(frame, polygon_with_offset)
 
-                # cv2.imshow('Vídeo com Polígono', frame)
                 if cv2.waitKey(25) & 0xFF == ord('q'):
                     break
 
