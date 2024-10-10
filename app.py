@@ -2,10 +2,6 @@ from fastapi import FastAPI, Response,Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 import cv2
-import numpy as np
-import random
-import json
-import time
 from services.regions_service import RegionService
 from services.dto import RegionDTO
 from models import Database
